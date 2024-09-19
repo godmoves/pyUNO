@@ -14,7 +14,7 @@ python driver.py
 ## Screenshots
 <p align="center">
   <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_home.PNG"/><br>
-  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_game.PNG"/><br>    
-  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_game1.PNG"/>
+  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_game.JPEG"/><br>    
+  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_game1.JPEG"/>
 </p>
 
