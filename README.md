@@ -12,9 +12,6 @@ python driver.py
 ```
 
 ## Screenshots
-<p align="center">
-  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_home.PNG"/><br>
-  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_game.JPEG"/><br>    
-  <img alt="Connect4" width="600px" src="https://github.com/Rutvik-C/UNO/blob/main/images/uno_game1.JPEG"/>
-</p>
-
+![home](./images/uno_home.PNG)
+![game_play1](./images/uno_game.JPEG)
+![game_play2](./images/uno_game1.JPEG)
