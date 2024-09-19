@@ -1,7 +1,5 @@
 import itertools
 import random
-import time
-
 
 def peek(s):
     """Peek"""
@@ -41,6 +39,11 @@ def set_curr_player(ob, default):
     if ob.current[0] == 'Skip' and ob.special_check == 0:
         ob.special_check = 1
         ob.position = (ob.position + ob.direction_check) % 4
+        # Clear next player's last played card
+        if ob.position == 0:
+            ob.last_played_card = [None] * 4
+        else:
+            ob.last_played_card[ob.position] = None
 
     if default:
         ob.position = (ob.position + ob.direction_check) % 4
@@ -62,6 +65,7 @@ def re_initialize(ob):
     ob.drawn, ob.played, ob.choose_color = False, False, False
     ob.uno = [True] * 4
     ob.easy = True
+    ob.last_played_card = [None] * 4
 
     # Dealing the cards
     create(ob)
@@ -94,12 +98,14 @@ def play_this_card(ob, card):
             ob.player_list[0].remove(ob.current)
             ob.special_check = 0
             set_curr_player(ob, False)
+            ob.last_played_card = [None] * 4
 
         if card[1] == 'Black':
             ob.played, ob.drawn = True, True
             ob.choose_color = True
             ob.player_list[0].remove(card)
             ob.deck2.append(card)
+            ob.last_played_card[0] = [None] * 4
 
 
 def play_this_card_2(ob, color):
@@ -144,6 +150,7 @@ def handle_black(ob, item):
         new_color = random.choice(ob.color)  # Random color picked for easy mode
     ob.message = "%s plays %s %s, new color is %s" % (ob.bot_map[ob.position], item[0], item[1], new_color)
     ob.current = (ob.current[0], new_color)
+    ob.last_played_card[ob.position] = ob.current
 
 
 def bot_play_card(ob, item):
@@ -152,15 +159,16 @@ def bot_play_card(ob, item):
     ob.deck2.append(item)
     ob.current = peek(ob.deck2)
     ob.message = "%s plays card %s" % (ob.bot_map[ob.position], ob.current[1] + " " + ob.current[0])
+    ob.last_played_card[ob.position] = ob.current
 
 
-def bot_action(ob, sounds, delay=2):
+def bot_action(ob, sounds, music_on):
     """Bot logic"""
     ob.message = ""
     ob.uno[ob.position] = False
+    ob.last_played_card[ob.position] = None
     ob.check = 0
-    if delay:
-        time.sleep(delay)
+
     if (ob.current[0] == '+2' or ob.current[0] == '+4') and ob.special_check == 0:
         handle24(ob, int(ob.current[0][1]))
         ob.played_check = 1
@@ -209,8 +217,10 @@ def bot_action(ob, sounds, delay=2):
             if ob.easy and random.randint(0, 1):
                 ob.uno[ob.position] = True
                 ob.message = "%s shouted UNO!" % ob.bot_map[ob.position]
-                sounds.uno.play()
+                if music_on:
+                    sounds.uno.play()
             else:
                 ob.uno[ob.position] = True
                 ob.message = "%s shouted UNO!" % ob.bot_map[ob.position]
-                sounds.uno.play()
+                if music_on:
+                    sounds.uno.play()

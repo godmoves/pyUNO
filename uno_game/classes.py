@@ -10,6 +10,7 @@ class Essentials(object):
         self.direction_check = 1  # Tracking direction of game
         self.position = -1  # Playing player index
         self.current = list()  # Current card on top of stack
+        self.last_played_card = [None] * 4
 
         self.drawn = False  # User play flags
         self.played = False

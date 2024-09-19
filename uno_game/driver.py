@@ -1,3 +1,4 @@
+import time
 from classes import *
 from functions import *
 
@@ -214,6 +215,15 @@ while active:
                 card = img.grayscale(card)
             root.blit(card, (590 - 50 * i, 470))
 
+        # Last Played Card
+        pos = [(0, 0), (170, 240), (460, 90), (750, 240)]
+        for i in range(1, 4):
+            if ess.last_played_card[i]:
+                if str(ess.last_played_card[i][0]) not in ["Wild", "+4"]:
+                    root.blit(pygame.image.load("./images/" + ess.last_played_card[i][1] + str(ess.last_played_card[i][0]) + ".png"), pos[i])
+                else:
+                    root.blit(pygame.image.load("./images/" + ess.last_played_card[i][1] + ".png"), pos[i])
+
         # Special Card Handling, Choose Color
         if ess.choose_color:
             root.blit(img.red, (395, 390))
@@ -250,8 +260,9 @@ while active:
 
             # Blitting active player line and essential buttons
             root.blit(img.line, (682, 550))
-            text = pygame.font.Font(fnt.joe_fin, 20).render("CLICK TO DRAW", True, (255, 238, 46))
-            root.blit(text, [305, 360])
+            if not ess.drawn:
+                text = pygame.font.Font(fnt.joe_fin, 20).render("CLICK TO DRAW", True, (255, 238, 46))
+                root.blit(text, [305, 360])
             if ess.played or ess.drawn:
                 root.blit(img.done, (775, 505))
                 root.blit(img.uno_button, (850, 500))
@@ -271,6 +282,7 @@ while active:
                 if ess.position == 0:
                     ess.uno[0] = False
                     ess.player_playing = True
+                    ess.last_played_card[0] = None
 
                 else:
                     # Reinitialising player flags
@@ -278,7 +290,9 @@ while active:
                     ess.drawn = False
 
                     # Making the bot play
-                    bot_action(ess, sound)
+                    bot_action(ess, sound, music_on=music_on)
+                    # TODO(pwj): Add a delay here to make the game more realistic
+                    time.sleep(2)
 
                 ess.play_lag = 0  # Resetting lag
 
