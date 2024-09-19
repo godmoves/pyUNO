@@ -20,7 +20,9 @@ pygame.display.set_icon(img.icon)
 pygame.mixer.music.load(sound.back_g)
 pygame.mixer.music.play(-1)  # continuous bg music
 pygame.mixer.music.set_volume(0.3)  # Setting background music volume
-music_on = True  # To track music status
+music_on = False  # To track music status
+if not music_on:
+    pygame.mixer.music.pause()
 
 # Setting up initial game variables
 active = True  # While game is ON this variable is True
@@ -91,13 +93,12 @@ while active:
                     music_on = True
 
             if ess.player_playing:  # Card click operations
-                if 850 < m[0] < 916 and 500 < m[1] < 565:  # UNO button
+                if 850 < m[0] < 916 and 500 < m[1] < 565 and len(ess.player_list[0]) == 1:  # UNO button
                     if music_on:
                         sound.uno.play()
-
                     ess.uno[0] = True
 
-                if 775 < m[0] < 840 and 505 < m[1] < 570:  # End turn button
+                if 775 < m[0] < 840 and 505 < m[1] < 570 and (ess.played or ess.drawn):  # End turn button
                     if music_on:
                         sound.click.play()
                     ess.player_playing = False
@@ -179,18 +180,27 @@ while active:
         root.blit(img.p3, (55, 440))
         root.blit(img.p4, (675, 490))
 
-        text = pygame.font.Font(fnt.joe_fin, 20).render("YOU", True, (255, 238, 46))
+        # Play Order
+        img_order = pygame.transform.scale(img.clockwise, (100, 100))
+        if ess.direction_check == -1:
+            img_order = pygame.transform.flip(img_order, True, False)
+        root.blit(img_order, (455, 250))
+
+        # Player Names
+        name = "YOU (UNO)" if ess.uno[0] else "YOU"
+        text = pygame.font.Font(fnt.joe_fin, 20).render(name, True, (255, 238, 46))
         root.blit(text, [690, 460])
-        text = pygame.font.Font(fnt.joe_fin, 20).render("EDITH", True, (255, 238, 46))
-        root.blit(text, [295, 4])
-        text = pygame.font.Font(fnt.joe_fin, 20).render("JARVIS", True, (255, 238, 46))
-        root.blit(text, [870, 60])
-        text = pygame.font.Font(fnt.joe_fin, 20).render("FRIDAY", True, (255, 238, 46))
+        text = pygame.font.Font(fnt.joe_fin, 20).render("BELLA", True, (255, 238, 46))
         root.blit(text, [60, 410])
+        text = pygame.font.Font(fnt.joe_fin, 20).render("CELINE", True, (255, 238, 46))
+        root.blit(text, [295, 4])
+        text = pygame.font.Font(fnt.joe_fin, 20).render("DEREK", True, (255, 238, 46))
+        root.blit(text, [870, 60])
 
         text = pygame.font.Font(fnt.joe_fin, 20).render(ess.message, True, (255, 238, 46))
         root.blit(text, [340, 210])
 
+        # Player Cards
         for i in range(len(ess.player_list[1])):
             root.blit(img.card_back_l, (40, 315 - 30 * i))
         for i in range(len(ess.player_list[2])):
@@ -198,10 +208,13 @@ while active:
         for i in range(len(ess.player_list[3])):
             root.blit(img.card_back_r, (845, 190 + 30 * i))
         for i in range(len(ess.player_list[0])):
-            root.blit(
-                pygame.image.load("./images/" + ess.player_list[0][i][1] + str(ess.player_list[0][i][0]) + ".png"),
-                (590 - 50 * i, 470))
+            card = pygame.image.load("./images/" + ess.player_list[0][i][1] + str(ess.player_list[0][i][0]) + ".png")
+            # Only the new drawn card can be played
+            if ess.drawn and not ess.played and i != len(ess.player_list[0]) - 1:
+                card = img.grayscale(card)
+            root.blit(card, (590 - 50 * i, 470))
 
+        # Special Card Handling, Choose Color
         if ess.choose_color:
             root.blit(img.red, (395, 390))
             root.blit(img.green, (450, 390))
@@ -237,8 +250,14 @@ while active:
 
             # Blitting active player line and essential buttons
             root.blit(img.line, (682, 550))
-            root.blit(img.done, (775, 505))
-            root.blit(img.uno_button, (850, 500))
+            text = pygame.font.Font(fnt.joe_fin, 20).render("CLICK TO DRAW", True, (255, 238, 46))
+            root.blit(text, [305, 360])
+            if ess.played or ess.drawn:
+                root.blit(img.done, (775, 505))
+                root.blit(img.uno_button, (850, 500))
+            else:
+                text = pygame.font.Font(fnt.joe_fin, 20).render("DRAW OR PLAY A CARD", True, (255, 238, 46))
+                root.blit(text, (750, 515))
 
         else:
             if ess.play_lag == 140:  # Implementing Lag between 2 players actions
@@ -315,9 +334,9 @@ while active:
 
     # Music toggle button
     if music_on:
-        root.blit(img.mute, (960, 8))
-    else:
         root.blit(img.unmute, (960, 8))
+    else:
+        root.blit(img.mute, (960, 8))
 
     # Refreshing screen
     pygame.display.update()

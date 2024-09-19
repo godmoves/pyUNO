@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 
 class Essentials(object):
@@ -20,10 +21,10 @@ class Essentials(object):
 
         self.played_check = 0  # Play checker
         self.special_check = 0  # Special card overhead checker
-        self.uno = [True] * 4  # UNO shout flags
+        self.uno = [False] * 4  # UNO shout flags
         self.message = "DEALING THE CARDS"  # In game messages
         self.easy = True  # Difficulty level
-        self.bot_map = {1: "FRIDAY", 2: "EDITH", 3: "JARVIS"}  # Indexing bot index to name
+        self.bot_map = {1: "BELLA", 2: "CELINE", 3: "DEREK"}  # Indexing bot index to name
         self.color = ['Blue', 'Red', 'Green', 'Yellow']  # Colors
 
 
@@ -46,9 +47,9 @@ class Image(object):
         self.mute = pygame.image.load("./images/mute.png")
         self.unmute = pygame.image.load("./images/unmute.png")
         self.p1 = pygame.image.load("./images/woman.png")
-        self.p2 = pygame.image.load("./images/man.png")
+        self.p2 = pygame.image.load("./images/man (1).png")
         self.p3 = pygame.image.load("./images/woman (1).png")
-        self.p4 = pygame.image.load("./images/man (1).png")
+        self.p4 = pygame.image.load("./images/man.png")
         self.card_back = pygame.image.load("./images/Back.png")
         self.card_back_l = pygame.image.load("./images/Back_left.png")
         self.card_back_r = pygame.image.load("./images/Back_right.png")
@@ -64,6 +65,14 @@ class Image(object):
         self.blue = pygame.image.load("./images/SmallBlue.png")
         self.yellow = pygame.image.load("./images/SmallYellow.png")
         self.green = pygame.image.load("./images/SmallGreen.png")
+        self.clockwise = pygame.image.load("./images/clockwise.png")
+
+    def grayscale(self, img):
+        arr = pygame.surfarray.array3d(img)
+        # Luminosity filter
+        avgs = [[(r*0.298 + g*0.587 + b*0.114) for (r,g,b) in col] for col in arr]
+        arr = np.array([[[avg,avg,avg] for avg in col] for col in avgs])
+        return pygame.surfarray.make_surface(arr)
 
 
 class Sound(object):

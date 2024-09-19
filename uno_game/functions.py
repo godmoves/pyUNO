@@ -1,5 +1,6 @@
 import itertools
 import random
+import time
 
 
 def peek(s):
@@ -17,10 +18,11 @@ def create(ob):
         ob.deck1.append(('+4', 'Black'))
     random.shuffle(ob.deck1)  # Shuffles deck
 
+    # TODO(mkp): The correct rule should be no Wild +4 for the initial card. But this is not a big issue.
     while peek(ob.deck1) in [('Wild', 'Black'), ('+4', 'Black'), ('Skip', 'Red'), ('Skip', 'Green'),
                              ('Skip', 'Blue'), ('Skip', 'Yellow'), ('Reverse', 'Red'), ('Reverse', 'Green'),
                              ('Reverse', 'Blue'), ('Reverse', 'Yellow'), ('+2', 'Red'), ('+2', 'Green'),
-                             ('+2', 'Blue'), ('+2', 'Yellow')]:  # First card cannot be special card
+                             ('+2', 'Blue'), ('+2', 'Yellow')]:
         random.shuffle(ob.deck1)
 
     ob.deck2.append(ob.deck1.pop())  # Shifts first card to played deck
@@ -29,8 +31,6 @@ def create(ob):
     for j in range(4):  # Deals cards to player
         for _ in range(7):
             ob.player_list[j].append(ob.deck1.pop())
-
-    # ob.player_list[0] = [('Wild', 'Black'), ('+4', 'Black'), ('Skip', 'Red'), ('Reverse', 'Green'), ("+2", "Blue")]
 
 
 def set_curr_player(ob, default):
@@ -83,6 +83,10 @@ def take_from_stack(ob):
 def play_this_card(ob, card):
     """Play card by user"""
     if not ob.played:
+        if ob.drawn and card != ob.player_list[0][-1]:
+            # If the player draws a card, he can play that card only
+            return
+
         if (card[0] == ob.current[0] or card[1] == ob.current[1]) and (card[0] not in ('+4', 'Wild')):
             ob.played, ob.drawn = True, True
             ob.deck2.append(card)
@@ -150,15 +154,16 @@ def bot_play_card(ob, item):
     ob.message = "%s plays card %s" % (ob.bot_map[ob.position], ob.current[1] + " " + ob.current[0])
 
 
-def bot_action(ob, sounds):
+def bot_action(ob, sounds, delay=2):
     """Bot logic"""
     ob.message = ""
     ob.uno[ob.position] = False
     ob.check = 0
+    if delay:
+        time.sleep(delay)
     if (ob.current[0] == '+2' or ob.current[0] == '+4') and ob.special_check == 0:
         handle24(ob, int(ob.current[0][1]))
         ob.played_check = 1
-
     else:
         check = 0
         for item in ob.player_list[ob.position]:
